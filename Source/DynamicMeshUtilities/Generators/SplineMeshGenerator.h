@@ -21,9 +21,6 @@ UCLASS()
 class DYNAMICMESHUTILITIES_API USplinePathGenerator : public UDynamicMeshSplineGenerator {
 	GENERATED_BODY()
 
-protected:
-	virtual bool AlignLocationWithFloor(FVector& location) const;
-
 public:
 	UPROPERTY(Category = "Generation Settings", EditAnywhere, BlueprintReadWrite, meta = (Delta = 10))
 	float Offset = 0.f;
@@ -33,8 +30,6 @@ public:
 	float MaxDistanceFromSpline = 50.f;
 	UPROPERTY(Category = "Generation settings", EditAnywhere, BlueprintReadWrite)
 	TEnumAsByte<ESplineCoordinateSpace::Type> SplineSpace = ESplineCoordinateSpace::Local;
-	UPROPERTY(Category = "Generation settings", EditAnywhere, BlueprintReadWrite)
-	bool AlignToFloor = true;
 	UPROPERTY(Category = "Generation settings", EditAnywhere, BlueprintReadWrite, meta = (InlineEditConditionToggle))
 	bool ScaleUVToWorld = true;
 	UPROPERTY(Category = "Generation settings", EditAnywhere, BlueprintReadWrite, meta = (EditCondition = ScaleUVToWorld))
