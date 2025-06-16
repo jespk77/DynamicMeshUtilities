@@ -1,6 +1,8 @@
 #include "SplineMeshGenerator.h"
 #include "Components/SplineComponent.h"
+
 #include "Generators/SweepGenerator.h"
+#include "CurveOps/TriangulateCurvesOp.h"
 
 void USplinePathGenerator::Generate(FDynamicMesh3& mesh) {
 	if (!ensure(Spline)) return;
@@ -38,4 +40,23 @@ void USplinePathGenerator::Generate(FDynamicMesh3& mesh) {
 
 void USplineSurfaceGenerator::Generate(FDynamicMesh3& mesh) {
 	if (!ensure(Spline)) return;
+
+	using namespace UE::Geometry;
+	FTriangulateCurvesOp curveGenerator;
+	curveGenerator.CombineMethod = ECombineCurvesMethod::Union;
+	curveGenerator.FlattenMethod = EFlattenCurveMethod::DoNotFlatten;
+	curveGenerator.OffsetClosedMethod = EOffsetClosedCurvesMethod::DoNotOffset;
+	curveGenerator.OffsetJoinMethod = EOffsetJoinMethod::Round;
+	curveGenerator.OffsetOpenMethod = EOffsetOpenCurvesMethod::TreatAsClosed;
+	curveGenerator.OpenEndShape = EOpenCurveEndShapes::Round;
+
+	TArray<FVector> splinePoints;
+	Spline->ConvertSplineToPolyLine(ESplineCoordinateSpace::World, MaxDistanceFromSpline, splinePoints);
+	curveGenerator.AddWorldCurve(splinePoints, true, FTransform::Identity);
+	curveGenerator.Thickness = Height;
+	curveGenerator.bWorldSpaceUVScale = ScaleUVToWorld;
+	curveGenerator.UVScaleFactor = UVWorldUnit;
+	curveGenerator.CalculateResult(nullptr);
+
+	mesh.Copy(*curveGenerator.ExtractResult());
 }

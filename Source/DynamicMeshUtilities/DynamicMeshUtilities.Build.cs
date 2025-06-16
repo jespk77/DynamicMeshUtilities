@@ -15,6 +15,7 @@ public class DynamicMeshUtilities : ModuleRules {
                 "CoreUObject", "Engine",
                 "Slate", "SlateCore",
                 "MeshModelingToolsExp",
+                "ModelingOperators",
             });
     }
 }
