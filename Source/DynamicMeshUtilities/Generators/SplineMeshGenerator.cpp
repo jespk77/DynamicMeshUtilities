@@ -34,6 +34,10 @@ void USplinePathGenerator::Generate(FDynamicMesh3& mesh) {
 	sweepGenerator.UnitUVInWorldCoordinates = UVWorldUnit;
 	sweepGenerator.Generate();
 	mesh.Copy(&sweepGenerator);
+
+	FDynamicMeshNormalOverlay* normals = mesh.Attributes()->GetNormalLayer(0);
+	for (int i = 0; i < normals->ElementCount(); i++)
+		normals->SetElement(i, FVector3f::UpVector);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -59,4 +63,8 @@ void USplineSurfaceGenerator::Generate(FDynamicMesh3& mesh) {
 	curveGenerator.CalculateResult(nullptr);
 
 	mesh.Copy(*curveGenerator.ExtractResult());
+
+	FDynamicMeshNormalOverlay* normals = mesh.Attributes()->GetNormalLayer(0);
+	for (int i = 0; i < normals->ElementCount(); i++)
+		normals->SetElement(i, FVector3f::UpVector);
 }
