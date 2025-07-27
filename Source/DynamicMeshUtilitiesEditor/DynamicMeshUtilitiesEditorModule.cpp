@@ -15,4 +15,4 @@ void FDynamicMeshUtilitiesEditorModule::ShutdownModule() {
 
 #undef LOCTEXT_NAMESPACE
 
-IMPLEMENT_MODULE(FDynamicMeshUtilitiesEditorModule, DynamicMeshUtilitiesEditorMode)
+IMPLEMENT_MODULE(FDynamicMeshUtilitiesEditorModule, DynamicMeshUtilitiesEditor)
