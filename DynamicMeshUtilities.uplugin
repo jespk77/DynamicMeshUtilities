@@ -17,12 +17,12 @@
         {
             "Name": "DynamicMeshUtilities",
             "Type": "Runtime",
-            "LoadingPhase": "Default"
+            "LoadingPhase": "PreDefault"
         },
         {
             "Name": "DynamicMeshUtilitiesEditor",
             "Type": "Editor",
-            "LoadingPhase": "Default"
+            "LoadingPhase": "PreDefault"
         }
     ],
     "Plugins": [
