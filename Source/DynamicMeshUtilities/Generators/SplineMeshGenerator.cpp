@@ -5,7 +5,7 @@
 #include "CurveOps/TriangulateCurvesOp.h"
 
 void USplinePathGenerator::Generate(FDynamicMesh3& mesh) {
-	if (!ensure(Spline)) return;
+	if (!ensure(Spline) || CrossSection.IsEmpty()) return;
 
 	TArray<FVector> splinePoints;
 	Spline->ConvertSplineToPolyLine(ESplineCoordinateSpace::World, MaxDistanceFromSpline, splinePoints);
