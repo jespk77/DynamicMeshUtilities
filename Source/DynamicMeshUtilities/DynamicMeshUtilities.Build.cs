@@ -13,7 +13,6 @@ public class DynamicMeshUtilities : ModuleRules {
         PrivateDependencyModuleNames.AddRange(
             new string[] {
                 "CoreUObject", "Engine",
-                "Slate", "SlateCore",
                 "MeshModelingToolsExp",
                 "ModelingOperators",
             });

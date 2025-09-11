@@ -1,8 +1,5 @@
 #pragma once
 
-#include "CoreMinimal.h"
-#include "Modules/ModuleManager.h"
-
 class FSweepMeshAssetActions;
 
 class FDynamicMeshUtilitiesEditorModule : public IModuleInterface {

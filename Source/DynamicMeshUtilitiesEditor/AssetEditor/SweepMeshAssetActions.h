@@ -1,6 +1,5 @@
 #pragma once
 
-#include "CoreMinimal.h"
 #include "AssetTypeActions_Base.h"
 #include "SweepMeshAssetEditorToolkit.h"
 #include "DynamicMeshUtilities/Assets/SweepMeshAsset.h"

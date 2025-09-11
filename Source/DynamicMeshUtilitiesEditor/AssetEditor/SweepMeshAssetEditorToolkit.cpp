@@ -83,4 +83,5 @@ void FSweepMeshAssetEditorToolkit::UnregisterTabSpawners(const TSharedRef<FTabMa
 	manager->UnregisterTabSpawner(SweepAssetViewerId);
 	manager->UnregisterTabSpawner(SweepAssetDetailsId);
 }
+
 #undef LOCTEXT_NAMESPACE

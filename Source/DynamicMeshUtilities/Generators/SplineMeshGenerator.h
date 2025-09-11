@@ -1,6 +1,5 @@
 #pragma once
 
-#include "CoreMinimal.h"
 #include "UDynamicMesh.h"
 #include "Components/SplineComponent.h"
 #include "SplineMeshGenerator.generated.h"

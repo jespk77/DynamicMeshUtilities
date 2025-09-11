@@ -2,13 +2,9 @@
 
 #define LOCTEXT_NAMESPACE "FDynamicMeshUtilitiesModule"
 
-void FDynamicMeshUtilitiesModule::StartupModule() {
+void FDynamicMeshUtilitiesModule::StartupModule() { }
 
-}
-
-void FDynamicMeshUtilitiesModule::ShutdownModule() {
-
-}
+void FDynamicMeshUtilitiesModule::ShutdownModule() { }
 
 #undef LOCTEXT_NAMESPACE
 

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Algo/Reverse.h"
 #include "SweepMeshAsset.generated.h"
 
