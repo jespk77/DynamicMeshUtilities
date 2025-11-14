@@ -5,7 +5,7 @@
 #include "CurveOps/TriangulateCurvesOp.h"
 
 void USplinePathGenerator::Generate(FDynamicMesh3& mesh) {
-	if (!ensure(Spline) || CrossSection.IsEmpty()) return;
+	if (!ensure(Spline) || Spline->GetNumberOfSplinePoints() == 0 || CrossSection.IsEmpty()) return;
 
 	TArray<FVector> splinePoints;
 	Spline->ConvertSplineToPolyLine(ESplineCoordinateSpace::World, MaxDistanceFromSpline, splinePoints);
@@ -43,7 +43,7 @@ void USplinePathGenerator::Generate(FDynamicMesh3& mesh) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void USplineSurfaceGenerator::Generate(FDynamicMesh3& mesh) {
-	if (!ensure(Spline)) return;
+	if (!ensure(Spline) || Spline->GetNumberOfSplinePoints() == 0) return;
 
 	using namespace UE::Geometry;
 	FTriangulateCurvesOp curveGenerator;
