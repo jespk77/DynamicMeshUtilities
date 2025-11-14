@@ -53,3 +53,17 @@ public:
 
 	virtual void Generate(FDynamicMesh3& mesh) override;
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/** 
+* An alternate way to generate a surface spline mesh using polygon extrude
+* This method gives much better results when generating sloped surfaces
+*/
+UCLASS()
+class DYNAMICMESHUTILITIES_API USplinePolygonSurfaceGenerator : public USplineSurfaceGenerator {
+	GENERATED_BODY()
+
+public:
+	virtual void Generate(FDynamicMesh3& mesh) override;
+};

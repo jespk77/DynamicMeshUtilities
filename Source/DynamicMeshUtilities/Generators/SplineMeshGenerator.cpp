@@ -3,6 +3,9 @@
 
 #include "Generators/SweepGenerator.h"
 #include "CurveOps/TriangulateCurvesOp.h"
+#include "ConstrainedDelaunay2.h"
+#include "Generators/FlatTriangulationMeshGenerator.h"
+#include "Operations/ExtrudeMesh.h"
 
 void USplinePathGenerator::Generate(FDynamicMesh3& mesh) {
 	if (!ensure(Spline) || Spline->GetNumberOfSplinePoints() == 0 || CrossSection.IsEmpty()) return;
@@ -67,4 +70,39 @@ void USplineSurfaceGenerator::Generate(FDynamicMesh3& mesh) {
 	FDynamicMeshNormalOverlay* normals = mesh.Attributes()->GetNormalLayer(0);
 	for (int i = 0; i < normals->ElementCount(); i++)
 		normals->SetElement(i, FVector3f::UpVector);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void USplinePolygonSurfaceGenerator::Generate(FDynamicMesh3& mesh) {
+	if (!ensure(Spline) || Spline->GetNumberOfSplinePoints() == 0) return;
+
+	using namespace UE::Geometry;
+	TArray<FVector> splinePoints;
+	Spline->ConvertSplineToPolyLine(ESplineCoordinateSpace::World, MaxDistanceFromSpline, splinePoints);
+
+	FPolygon2d splinePolygon;
+	for (const FVector& point : splinePoints)
+		splinePolygon.AppendVertex(FVector2D(point));
+
+	FConstrainedDelaunay2d triangulator;
+	triangulator.Add(splinePolygon);
+	triangulator.Triangulate();
+	if (triangulator.Triangles.IsEmpty()) return;
+
+	FFlatTriangulationMeshGenerator generator;
+	generator.Vertices2D = triangulator.Vertices;
+	generator.Triangles2D = triangulator.Triangles;
+	mesh.Copy(&generator.Generate());
+
+	for (int vid : mesh.VertexIndicesItr()) {
+		FVector3d vertexPosition = mesh.GetVertex(vid);
+		vertexPosition.Z = (double)splinePoints[vid].Z;
+		mesh.SetVertex(vid, vertexPosition);
+	}
+
+	FExtrudeMesh extruder(&mesh);
+	extruder.DefaultExtrudeDistance = Height;
+	extruder.IsPositiveOffset = Height >= 0;
+	extruder.Apply();
 }

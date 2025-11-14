@@ -7,6 +7,7 @@ public class DynamicMeshUtilities : ModuleRules {
         PublicDependencyModuleNames.AddRange(
             new string[] {
                 "Core",
+                "DynamicMesh",
                 "GeometryCore", "GeometryFramework",
             });
 
@@ -15,6 +16,7 @@ public class DynamicMeshUtilities : ModuleRules {
                 "CoreUObject", "Engine",
                 "MeshModelingToolsExp",
                 "ModelingOperators",
+                "GeometryAlgorithms",
             });
     }
 }
