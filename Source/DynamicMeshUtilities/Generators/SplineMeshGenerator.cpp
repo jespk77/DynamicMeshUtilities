@@ -7,11 +7,25 @@
 #include "Generators/FlatTriangulationMeshGenerator.h"
 #include "Operations/ExtrudeMesh.h"
 
+inline bool UDynamicMeshSplineGenerator::IsValidSegment() const {
+	return SplineSegment >= 0 && SplineSegment < Spline->GetNumberOfSplineSegments();
+}
+
+bool UDynamicMeshSplineGenerator::GetPolyLineFromSpline(TArray<FVector>& points) const {
+	if (!Spline) return false;
+
+	points.Reset();
+	if (IsValidSegment()) Spline->ConvertSplineSegmentToPolyLine(SplineSegment, ESplineCoordinateSpace::World, MaxDistanceFromSpline, points);
+	else Spline->ConvertSplineToPolyLine(ESplineCoordinateSpace::World, MaxDistanceFromSpline, points);
+	return !points.IsEmpty();
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 void USplinePathGenerator::Generate(FDynamicMesh3& mesh) {
 	if (!ensure(Spline) || Spline->GetNumberOfSplinePoints() == 0 || CrossSection.IsEmpty()) return;
-
 	TArray<FVector> splinePoints;
-	Spline->ConvertSplineToPolyLine(ESplineCoordinateSpace::World, MaxDistanceFromSpline, splinePoints);
+	if (!GetPolyLineFromSpline(splinePoints)) return;
 
 	using namespace UE::Geometry;
 	FGeneralizedCylinderGenerator sweepGenerator;
@@ -36,8 +50,8 @@ void USplinePathGenerator::Generate(FDynamicMesh3& mesh) {
 	sweepGenerator.bUVScaleRelativeWorld = ScaleUVToWorld;
 	sweepGenerator.UnitUVInWorldCoordinates = UVWorldUnit;
 	sweepGenerator.Generate();
-	mesh.Copy(&sweepGenerator);
 
+	mesh.Copy(&sweepGenerator);
 	FDynamicMeshNormalOverlay* normals = mesh.Attributes()->GetNormalLayer(0);
 	for (int i = 0; i < normals->ElementCount(); i++)
 		normals->SetElement(i, FVector3f::UpVector);
@@ -47,6 +61,8 @@ void USplinePathGenerator::Generate(FDynamicMesh3& mesh) {
 
 void USplineSurfaceGenerator::Generate(FDynamicMesh3& mesh) {
 	if (!ensure(Spline) || Spline->GetNumberOfSplinePoints() == 0) return;
+	TArray<FVector> splinePoints;
+	if (!GetPolyLineFromSpline(splinePoints)) return;
 
 	using namespace UE::Geometry;
 	FTriangulateCurvesOp curveGenerator;
@@ -56,9 +72,6 @@ void USplineSurfaceGenerator::Generate(FDynamicMesh3& mesh) {
 	curveGenerator.OffsetJoinMethod = EOffsetJoinMethod::Round;
 	curveGenerator.OffsetOpenMethod = EOffsetOpenCurvesMethod::TreatAsClosed;
 	curveGenerator.OpenEndShape = EOpenCurveEndShapes::Round;
-
-	TArray<FVector> splinePoints;
-	Spline->ConvertSplineToPolyLine(ESplineCoordinateSpace::World, MaxDistanceFromSpline, splinePoints);
 	curveGenerator.AddWorldCurve(splinePoints, true, FTransform::Identity);
 	curveGenerator.Thickness = Height;
 	curveGenerator.bWorldSpaceUVScale = ScaleUVToWorld;
@@ -66,7 +79,6 @@ void USplineSurfaceGenerator::Generate(FDynamicMesh3& mesh) {
 	curveGenerator.CalculateResult(nullptr);
 
 	mesh.Copy(*curveGenerator.ExtractResult());
-
 	FDynamicMeshNormalOverlay* normals = mesh.Attributes()->GetNormalLayer(0);
 	for (int i = 0; i < normals->ElementCount(); i++)
 		normals->SetElement(i, FVector3f::UpVector);
@@ -76,11 +88,10 @@ void USplineSurfaceGenerator::Generate(FDynamicMesh3& mesh) {
 
 void USplinePolygonSurfaceGenerator::Generate(FDynamicMesh3& mesh) {
 	if (!ensure(Spline) || Spline->GetNumberOfSplinePoints() == 0) return;
+	TArray<FVector> splinePoints;
+	if (!GetPolyLineFromSpline(splinePoints)) return;
 
 	using namespace UE::Geometry;
-	TArray<FVector> splinePoints;
-	Spline->ConvertSplineToPolyLine(ESplineCoordinateSpace::World, MaxDistanceFromSpline, splinePoints);
-
 	FPolygon2d splinePolygon;
 	for (const FVector& point : splinePoints)
 		splinePolygon.AppendVertex(FVector2D(point));

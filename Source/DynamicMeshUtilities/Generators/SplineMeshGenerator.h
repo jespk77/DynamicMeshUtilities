@@ -8,9 +8,15 @@ UCLASS(Abstract)
 class DYNAMICMESHUTILITIES_API UDynamicMeshSplineGenerator : public UDynamicMeshGenerator {
 	GENERATED_BODY()
 
+protected:
+	inline bool IsValidSegment() const;
+	bool GetPolyLineFromSpline(TArray<FVector>& points) const;
+
 public:
 	UPROPERTY(Category = "Generation Settings", BlueprintReadWrite)
 	TObjectPtr<USplineComponent> Spline;
+	UPROPERTY(Category = "Generation Settings", BlueprintReadWrite)
+	int SplineSegment = INDEX_NONE;
 
 	UPROPERTY(Category = "Generation Settings", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = 5, Delta = 5))
 	float MaxDistanceFromSpline = 10.f;
@@ -56,7 +62,7 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-/** 
+/**
 * An alternate way to generate a surface spline mesh using polygon extrude
 * This method gives much better results when generating sloped surfaces
 */
