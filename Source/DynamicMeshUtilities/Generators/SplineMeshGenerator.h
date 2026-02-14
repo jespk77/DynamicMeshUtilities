@@ -9,14 +9,13 @@ class DYNAMICMESHUTILITIES_API UDynamicMeshSplineGenerator : public UDynamicMesh
 	GENERATED_BODY()
 
 protected:
-	inline bool IsValidSegment() const;
+	inline bool IsValidSegment(const int32 segment) const;
 	bool GetPolyLineFromSpline(TArray<FVector>& points) const;
+	bool GetPolyLineFromSpline(TArray<FVector>& points, const int32 segment) const;
 
 public:
 	UPROPERTY(Category = "Generation Settings", BlueprintReadWrite)
 	TObjectPtr<USplineComponent> Spline;
-	UPROPERTY(Category = "Generation Settings", BlueprintReadWrite)
-	int SplineSegment = INDEX_NONE;
 
 	UPROPERTY(Category = "Generation Settings", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = 5, Delta = 5))
 	float MaxDistanceFromSpline = 10.f;
@@ -33,6 +32,9 @@ UCLASS()
 class DYNAMICMESHUTILITIES_API USplinePathGenerator : public UDynamicMeshSplineGenerator {
 	GENERATED_BODY()
 
+protected:
+	void GenerateMeshFromPolyLine(const TArray<FVector>& linePoints, FDynamicMesh3& mesh);
+
 public:
 	UPROPERTY(Category = "Generation Settings", EditAnywhere, BlueprintReadWrite, meta = (Delta = 10))
 	float Offset = 0.f;
@@ -40,8 +42,23 @@ public:
 	TArray<FVector2D> CrossSection;
 	UPROPERTY(Category = "Generation settings", EditAnywhere, BlueprintReadWrite)
 	TEnumAsByte<ESplineCoordinateSpace::Type> SplineSpace = ESplineCoordinateSpace::Local;
-	UPROPERTY(Category = "Generation settings", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = 0))
-	int GroupID = 0;
+
+	UFUNCTION(Category = "Generation Settings", BlueprintCallable)
+	void SetRectangularCrossSection(const float minX, const float minY, const float maxX, const float maxY);
+
+	virtual void Generate(FDynamicMesh3& mesh) override;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/** Generates a mesh following 1 or more segments of a spline */
+UCLASS()
+class DYNAMICMESHUTILITIES_API USplineMultiPathGenerator : public USplinePathGenerator {
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(Category = "Generation Settings", BlueprintReadWrite)
+	TArray<int32> SplineSegments;
 
 	virtual void Generate(FDynamicMesh3& mesh) override;
 };

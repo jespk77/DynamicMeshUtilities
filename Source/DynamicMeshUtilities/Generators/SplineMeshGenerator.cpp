@@ -7,29 +7,32 @@
 #include "Generators/FlatTriangulationMeshGenerator.h"
 #include "Operations/ExtrudeMesh.h"
 
-inline bool UDynamicMeshSplineGenerator::IsValidSegment() const {
-	return SplineSegment >= 0 && SplineSegment < Spline->GetNumberOfSplineSegments();
+inline bool UDynamicMeshSplineGenerator::IsValidSegment(const int32 segment) const {
+	return Spline && segment >= 0 && segment < Spline->GetNumberOfSplineSegments();
 }
 
 bool UDynamicMeshSplineGenerator::GetPolyLineFromSpline(TArray<FVector>& points) const {
 	if (!Spline) return false;
 
 	points.Reset();
-	if (IsValidSegment()) Spline->ConvertSplineSegmentToPolyLine(SplineSegment, ESplineCoordinateSpace::World, MaxDistanceFromSpline, points);
-	else Spline->ConvertSplineToPolyLine(ESplineCoordinateSpace::World, MaxDistanceFromSpline, points);
+	Spline->ConvertSplineToPolyLine(ESplineCoordinateSpace::World, MaxDistanceFromSpline, points);
+	return !points.IsEmpty();
+}
+
+bool UDynamicMeshSplineGenerator::GetPolyLineFromSpline(TArray<FVector>& points, const int32 segment) const {
+	if (!IsValidSegment(segment)) return false;
+
+	points.Reset();
+	Spline->ConvertSplineSegmentToPolyLine(segment, ESplineCoordinateSpace::World, MaxDistanceFromSpline, points);
 	return !points.IsEmpty();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void USplinePathGenerator::Generate(FDynamicMesh3& mesh) {
-	if (!ensure(Spline) || Spline->GetNumberOfSplinePoints() == 0 || CrossSection.IsEmpty()) return;
-	TArray<FVector> splinePoints;
-	if (!GetPolyLineFromSpline(splinePoints)) return;
-
+void USplinePathGenerator::GenerateMeshFromPolyLine(const TArray<FVector>& linePoints, FDynamicMesh3& mesh) {
 	using namespace UE::Geometry;
 	FGeneralizedCylinderGenerator sweepGenerator;
-	for (const FVector& point : splinePoints) {
+	for (const FVector& point : linePoints) {
 		const float key = Spline->FindInputKeyClosestToWorldLocation(point);
 		const FQuat rotation = Spline->GetQuaternionAtSplineInputKey(key, SplineSpace);
 		const FVector location = Spline->GetLocationAtSplineInputKey(key, SplineSpace) + (rotation.GetRightVector() * Offset);
@@ -55,6 +58,36 @@ void USplinePathGenerator::Generate(FDynamicMesh3& mesh) {
 	FDynamicMeshNormalOverlay* normals = mesh.Attributes()->GetNormalLayer(0);
 	for (int i = 0; i < normals->ElementCount(); i++)
 		normals->SetElement(i, FVector3f::UpVector);
+}
+
+void USplinePathGenerator::SetRectangularCrossSection(const float minX, const float minY, const float maxX, const float maxY) {
+	CrossSection = {
+		FVector2D(maxX, minY),
+		FVector2D(maxX, maxY),
+		FVector2D(0, maxY),
+		FVector2D(minX, maxY),
+		FVector2D(minX, 0),
+		FVector2D(maxX, 0),
+	};
+}
+
+void USplinePathGenerator::Generate(FDynamicMesh3& mesh) {
+	if (!ensure(Spline) || Spline->GetNumberOfSplinePoints() == 0 || CrossSection.IsEmpty()) return;
+	TArray<FVector> splinePoints;
+	if (GetPolyLineFromSpline(splinePoints))
+		GenerateMeshFromPolyLine(splinePoints, mesh);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void USplineMultiPathGenerator::Generate(FDynamicMesh3& mesh) {
+	if (!ensure(Spline) || Spline->GetNumberOfSplinePoints() == 0 || CrossSection.IsEmpty()) return;
+	TArray<FVector> splinePoints;
+
+	for (const int32 segment : SplineSegments) {
+		if (GetPolyLineFromSpline(splinePoints, segment))
+			GenerateMeshFromPolyLine(splinePoints, mesh);
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
