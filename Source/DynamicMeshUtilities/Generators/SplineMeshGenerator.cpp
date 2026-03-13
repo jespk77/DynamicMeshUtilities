@@ -72,7 +72,7 @@ void USplinePathGenerator::SetRectangularCrossSection(const float minX, const fl
 }
 
 void USplinePathGenerator::Generate(FDynamicMesh3& mesh) {
-	if (!ensure(Spline) || Spline->GetNumberOfSplinePoints() == 0 || CrossSection.IsEmpty()) return;
+	if (!Spline || Spline->GetNumberOfSplinePoints() == 0 || CrossSection.IsEmpty()) return;
 	TArray<FVector> splinePoints;
 	if (GetPolyLineFromSpline(splinePoints))
 		GenerateMeshFromPolyLine(splinePoints, mesh);
@@ -81,7 +81,7 @@ void USplinePathGenerator::Generate(FDynamicMesh3& mesh) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void USplineMultiPathGenerator::Generate(FDynamicMesh3& mesh) {
-	if (!ensure(Spline) || Spline->GetNumberOfSplinePoints() == 0 || CrossSection.IsEmpty()) return;
+	if (!Spline || Spline->GetNumberOfSplinePoints() == 0 || CrossSection.IsEmpty()) return;
 	TArray<FVector> splinePoints;
 
 	for (const int32 segment : SplineSegments) {
@@ -93,7 +93,7 @@ void USplineMultiPathGenerator::Generate(FDynamicMesh3& mesh) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void USplineSurfaceGenerator::Generate(FDynamicMesh3& mesh) {
-	if (!ensure(Spline) || Spline->GetNumberOfSplinePoints() == 0) return;
+	if (!Spline || Spline->GetNumberOfSplinePoints() == 0) return;
 	TArray<FVector> splinePoints;
 	if (!GetPolyLineFromSpline(splinePoints)) return;
 
@@ -120,7 +120,7 @@ void USplineSurfaceGenerator::Generate(FDynamicMesh3& mesh) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void USplinePolygonSurfaceGenerator::Generate(FDynamicMesh3& mesh) {
-	if (!ensure(Spline) || Spline->GetNumberOfSplinePoints() == 0) return;
+	if (!Spline || Spline->GetNumberOfSplinePoints() == 0) return;
 	TArray<FVector> splinePoints;
 	if (!GetPolyLineFromSpline(splinePoints)) return;
 
