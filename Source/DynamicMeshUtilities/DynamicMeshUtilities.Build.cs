@@ -2,21 +2,19 @@ using UnrealBuildTool;
 
 public class DynamicMeshUtilities : ModuleRules {
     public DynamicMeshUtilities(ReadOnlyTargetRules target) : base(target) {
-        PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
+        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        PublicDependencyModuleNames.AddRange(
-            new string[] {
-                "Core",
-                "DynamicMesh",
-                "GeometryCore", "GeometryFramework",
-            });
+        PublicDependencyModuleNames.AddRange([
+            "Core",
+            "DynamicMesh",
+            "GeometryCore", "GeometryFramework",
+        ]);
 
-        PrivateDependencyModuleNames.AddRange(
-            new string[] {
-                "CoreUObject", "Engine",
-                "MeshModelingToolsExp",
-                "ModelingOperators",
-                "GeometryAlgorithms",
-            });
+        PrivateDependencyModuleNames.AddRange([
+            "CoreUObject", "Engine",
+            "MeshModelingToolsExp",
+            "ModelingOperators",
+            "GeometryAlgorithms",
+        ]);
     }
 }

@@ -2,22 +2,23 @@ using UnrealBuildTool;
 
 public class DynamicMeshUtilitiesEditor : ModuleRules {
     public DynamicMeshUtilitiesEditor(ReadOnlyTargetRules target) : base(target) {
-        PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
+        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        PublicDependencyModuleNames.AddRange(
-            new string[] {
-                "Core",
-                "GeometryCore", "GeometryFramework",
-                "DynamicMeshUtilities",
-            });
+        CppCompileWarningSettings.UnreachableCodeWarningLevel = WarningLevel.Warning;
+        CppCompileWarningSettings.ImplicitIntConversionWarningLevel = WarningLevel.Warning;
 
-        PrivateDependencyModuleNames.AddRange(
-            new string[] {
-                "CoreUObject", "Engine", "UnrealEd",
-                "Slate", "SlateCore",
-                "InputCore",
-                "EditorFramework", "EditorStyle",
-                "MeshModelingToolsExp",
-            });
+        PublicDependencyModuleNames.AddRange([
+            "Core",
+            "GeometryCore", "GeometryFramework",
+            "DynamicMeshUtilities",
+        ]);
+
+        PrivateDependencyModuleNames.AddRange([
+            "CoreUObject", "Engine", "UnrealEd",
+            "Slate", "SlateCore",
+            "InputCore",
+            "EditorFramework", "EditorStyle",
+            "MeshModelingToolsExp",
+        ]);
     }
 }
